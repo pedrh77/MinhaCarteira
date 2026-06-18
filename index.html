@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minha Carteira</title>
+  <style>
+    :root {
+      --blue: #0e6be8;
+      --blue-line: rgba(255, 255, 255, 0.14);
+      --text: #111827;
+      --surface: #f3f4f6;
+      --white: #ffffff;
+      --border: #d1d5db;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background-attachment: fixed;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      margin: 0 auto;
+      padding-bottom: 24px;
+      overflow-x: hidden;
+    }
+
+    .screen {
+      display: none;
+      min-height: 100vh;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .setup-screen {
+      display: none;
+    }
+
+    .setup-screen.active {
+      display: flex;
+    }
+
+    .top {
+      width: 100vw;
+      margin-left: calc(50% - 50vw);
+      color: var(--white);
+      text-align: center;
+      padding: 18px 16px 22px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: #0e6be8;
+      box-shadow: 0 8px 18px rgba(12, 34, 66, 0.08);
+      transition: padding 180ms ease, box-shadow 180ms ease, opacity 180ms ease, transform 180ms ease;
+    }
+
+    .top.is-collapsed {
+      padding-top: 8px;
+      padding-bottom: 10px;
+      opacity: 0.98;
+      box-shadow: 0 4px 12px rgba(12, 34, 66, 0.06);
+      transform: translateY(-8px);
+    }
+
+    .top h1 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .brand {
+      margin-top: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--white);
+      transition: transform 180ms ease, opacity 180ms ease;
+    }
+
+    .top.is-collapsed .brand {
+      transform: translateY(-4px) scale(0.96);
+      opacity: 0.96;
+    }
+
+    .brand-logo {
+      width: min(190px, 62vw);
+      height: auto;
+      object-fit: contain;
+      display: block;
+      transition: width 180ms ease, opacity 180ms ease;
+    }
+
+    .top.is-collapsed .brand-logo {
+      width: min(172px, 56vw);
+    }
+
+    .main {
+      padding: 0 0 24px;
+    }
+
+    .card,
+    .menu-card {
+      width: calc(100% - 24px);
+      margin: 0 auto 18px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, #0a356b 0%, #0b4283 100%);
+      color: var(--white);
+      border: 4px solid rgba(204, 226, 255, 0.75);
+      border-radius: 34px;
+      box-shadow: 0 18px 30px rgba(12, 34, 66, 0.22);
+      overflow: hidden;
+    }
+
+    .card.is-collapsed .divider,
+    .card.is-collapsed .section:not(:first-of-type) {
+      display: none;
+    }
+
+    .card-header {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 18px;
+      padding: 20px 20px 18px;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: #111111;
+      display: grid;
+      place-items: center;
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .student-name {
+      margin: 0 0 10px;
+      font-size: 1.35rem;
+      line-height: 1.1;
+      font-weight: 800;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 76px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #3f9b08 0%, #2c7e05 100%);
+      color: #d8f6c8;
+      font-size: 0.93rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--blue-line);
+    }
+
+    .section {
+      padding: 18px 22px 20px;
+      border-top: 1px solid var(--blue-line);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 24px;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 4px;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 0.97rem;
+      font-weight: 700;
+    }
+
+    .field-value {
+      display: block;
+      font-size: 1.04rem;
+      line-height: 1.25;
+      font-weight: 500;
+    }
+
+    .section-title {
+      margin: 0 0 6px;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 0.98rem;
+      font-weight: 700;
+    }
+
+    .course-name {
+      margin: 0 0 18px;
+      font-size: 1.08rem;
+      font-weight: 500;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 24px;
+    }
+
+    .meta-grid .full {
+      grid-column: 1 / -1;
+    }
+
+    .footer-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 16px;
+    }
+
+    .copy-btn {
+      width: 34px;
+      height: 34px;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      color: var(--white);
+      opacity: 0.9;
+    }
+
+    .copy-btn svg,
+    .nav-item svg,
+    .link-icon svg {
+      display: block;
+    }
+
+    .action-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 14px auto 24px;
+      color: #1c72e6;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.02rem;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .action-wrap {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .account-title {
+      margin: 18px 26px 18px;
+      font-size: 1.9rem;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .exit-btn {
+      width: calc(100% - 24px);
+      margin: 12px auto 92px;
+      display: block;
+      border: 0;
+      border-radius: 16px;
+      background: #ffffff;
+      color: #b42318;
+      font-size: 1rem;
+      font-weight: 800;
+      padding: 16px 18px;
+      box-shadow: 0 10px 24px rgba(12, 34, 66, 0.08);
+    }
+
+    .menu-card {
+      border: 2px solid var(--border);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.95);
+      overflow: hidden;
+    }
+
+    .menu-item {
+      padding: 22px 28px;
+      font-size: 1.05rem;
+      color: #343a40;
+    }
+
+    .menu-item+.menu-item {
+      border-top: 1px solid #e6e7ea;
+    }
+
+    .edit-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .edit-form label {
+      display: grid;
+      gap: 8px;
+    }
+
+    .edit-form span {
+      font-size: 0.95rem;
+      color: #4b5563;
+    }
+
+    .edit-form input,
+    .edit-form select,
+    .edit-form button {
+      font: inherit;
+    }
+
+    .edit-form input,
+    .edit-form select {
+      padding: 14px 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .edit-form button {
+      padding: 14px 16px;
+      border: 0;
+      border-radius: 12px;
+      background: #0e6be8;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .setup-actions {
+      display: grid;
+      gap: 10px;
+    }
+
+    .secondary-btn {
+      padding: 14px 16px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      background: #fff;
+      color: #1f2937;
+      font-weight: 700;
+    }
+
+    .nav {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: min(430px, 100%);
+      background: rgba(255, 255, 255, 0.98);
+      border-top: 1px solid #e5e7eb;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      padding: 10px 8px 12px;
+      z-index: 10;
+    }
+
+    .nav-item {
+      border: 0;
+      background: transparent;
+      color: #9b9b9b;
+      display: grid;
+      gap: 6px;
+      justify-items: center;
+      font-size: 0.8rem;
+    }
+
+    .nav-item.active {
+      color: #2e67d1;
+    }
+
+    .nav-item svg {
+      width: 30px;
+      height: 30px;
+    }
+
+    @media (max-width: 480px) {
+      .top {
+        padding: 14px 12px 18px;
+      }
+
+      .brand {
+        margin-top: 10px;
+      }
+
+      .brand-logo {
+        width: min(170px, 56vw);
+      }
+
+      .card,
+      .menu-card,
+      .setup-card {
+        width: calc(100% - 14px);
+      }
+
+      .card-header {
+        padding: 18px 14px 16px;
+        gap: 12px;
+      }
+
+      .section {
+        padding: 16px 14px 18px;
+      }
+
+      .account-title {
+        margin: 16px 14px 14px;
+        font-size: 1.65rem;
+      }
+
+      .menu-item {
+        padding: 18px 18px;
+      }
+
+      .setup-screen {
+        padding: 0 0 18px;
+      }
+
+      .exit-btn {
+        width: calc(100% - 14px);
+        margin-bottom: 96px;
+      }
+    }
+
+    .setup-screen {
+      flex-direction: column;
+      padding: 0 0 24px;
+    }
+
+    .setup-card {
+      width: calc(100% - 24px);
+      margin: 12px auto 0;
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 18px 30px rgba(12, 34, 66, 0.12);
+    }
+
+    .setup-title {
+      margin: 0 0 8px;
+      font-size: 1.6rem;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .setup-text {
+      margin: 0 0 18px;
+      color: #6b7280;
+    }
+
+    @media (max-width: 380px) {
+      .top h1 {
+        font-size: 1.05rem;
+      }
+
+      .card-header {
+        grid-template-columns: 76px 1fr;
+      }
+
+      .avatar {
+        width: 76px;
+        height: 76px;
+        font-size: 1.35rem;
+      }
+
+      .student-name {
+        font-size: 1.15rem;
+      }
+
+      .grid-2,
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav {
+        padding: 8px 4px 10px;
+      }
+
+      .nav-item {
+        gap: 4px;
+        font-size: 0.72rem;
+      }
+
+      .nav-item svg {
+        width: 26px;
+        height: 26px;
+      }
+    }
+
+    @media (min-width: 431px) {
+
+      .setup-screen,
+      .main {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <section class="screen setup-screen" id="setupScreen">
+      <div class="top">
+        <h1>Perfil</h1>
+        <div class="brand" aria-label="Estácio">
+          <img class="brand-logo" src="universidade-estacio-de-sa-logo-png_seeklogo-193869.webp"
+            alt="Logo da Estácio" />
+        </div>
+      </div>
+
+      <div class="setup-card">
+        <h2 class="setup-title">Montar sua carteirinha</h2>
+        <p class="setup-text">Digite seus dados e siga para a tela limpa do perfil.</p>
+
+        <div class="edit-form">
+          <label>
+            <span>Seu nome</span>
+            <input id="nameInput" type="text" placeholder="Digite seu nome" />
+          </label>
+
+          <label>
+            <span>Seu curso</span>
+            <select id="courseSelect">
+              <option value="Administração">Administração</option>
+              <option value="Fotografia">Fotografia</option>
+              <option value="Biomedicina">Biomedicina</option>
+              <option value="Artes Visuais">Artes Visuais </option>
+              <option value="Ciência da Computação">Ciência da Computação</option>
+              <option value="Análise e Desenvolvimento de Sistemas">Análise e Desenvolvimento de Sistemas</option>
+              <option value="Engenharia de Software">Engenharia de Software</option>
+            </select>
+          </label>
+
+          <label>
+            <span>CPF</span>
+            <input id="cpfInput" type="text" inputmode="numeric" placeholder="000.000.000-00" maxlength="14" />
+          </label>
+
+          <label>
+            <span>Data de nascimento</span>
+            <input id="birthInput" type="date" />
+          </label>
+
+          <div class="setup-actions">
+            <button id="continueBtn" type="button">Continuar</button>
+            <button id="randomBtn" class="secondary-btn" type="button">Sortear matrícula agora</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen active" id="profileScreen">
+      <div class="top">
+        <h1>Perfil</h1>
+        <div class="brand" aria-label="Estácio">
+          <img class="brand-logo" src="universidade-estacio-de-sa-logo-png_seeklogo-193869.webp"
+            alt="Logo da Estácio" />
+        </div>
+      </div>
+
+      <main class="main">
+        <section class="card" aria-label="Carteirinha do estudante">
+          <div class="card-header">
+            <div class="avatar" id="avatar"></div>
+            <div>
+              <h2 class="student-name" id="studentName"></h2>
+              <span class="badge">Ativo</span>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="section">
+            <div class="grid-2">
+              <div>
+                <span class="field-label">CPF</span>
+                <span class="field-value" id="cpfDisplay"></span>
+              </div>
+              <div>
+                <span class="field-label">Nascimento</span>
+                <span class="field-value" id="birthDisplay"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <p class="section-title">Curso</p>
+            <p class="course-name" id="courseName"></p>
+
+            <div class="meta-grid">
+              <div>
+                <span class="field-label">Tipo de curso</span>
+                <span class="field-value">Graduação</span>
+              </div>
+              <div>
+                <span class="field-label">Modelo de ensino</span>
+                <span class="field-value">Presencial</span>
+              </div>
+              <div class="full">
+                <span class="field-label">Campus</span>
+                <span class="field-value">Ribeirania</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="footer-row">
+              <div>
+                <span class="field-label">Validade</span>
+                <span class="field-value" id="validityDisplay"></span>
+              </div>
+              <div>
+                <span class="field-label">Matrícula</span>
+                <span class="field-value" id="registrationNumber">2023 0000 0000</span>
+              </div>
+              <button class="copy-btn" id="copyBtn" type="button" aria-label="Copiar matrícula">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                  stroke-linejoin="round" aria-hidden="true">
+                  <rect x="9" y="9" width="12" height="12" rx="2"></rect>
+                  <rect x="3" y="3" width="12" height="12" rx="2"></rect>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <div class="action-wrap">
+          <button class="action-link" type="button" id="toggleCardBtn">
+            <span class="link-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 17 17 7"></path>
+                <path d="M17 17V7H7"></path>
+              </svg>
+            </span>
+            Recolher carteirinha
+          </button>
+        </div>
+
+        <h2 class="account-title">Minha conta</h2>
+
+        <section class="menu-card" aria-label="Menu da conta">
+          <div class="menu-item">Meus dados</div>
+          <div class="menu-item">Política de Privacidade</div>
+          <div class="menu-item">Configurações</div>
+        </section>
+
+        <button class="exit-btn" type="button" id="exitBtn">Sair</button>
+      </main>
+
+      <nav class="nav" aria-label="Navegação inferior">
+        <button class="nav-item" type="button" aria-label="Início">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M3 11.5 12 4l9 7.5"></path>
+            <path d="M5 10.5V20h14v-9.5"></path>
+            <path d="M9 20v-6h6v6"></path>
+          </svg>
+          <span>Início</span>
+        </button>
+        <button class="nav-item" type="button" aria-label="Carreiras">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M12 2c3 2.5 5 5.9 5 9.3 0 4.4-2.6 8.7-5 10.7-2.4-2-5-6.3-5-10.7C7 7.9 9 4.5 12 2Z"></path>
+            <circle cx="12" cy="11" r="2.2"></circle>
+          </svg>
+          <span>Carreiras</span>
+        </button>
+        <button class="nav-item" type="button" aria-label="Financeiro">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M12 3v18"></path>
+            <path d="M17 7.5c0-2.2-2.2-3.5-5-3.5s-5 1.3-5 3.5 2.2 3.5 5 3.5 5 1.3 5 3.5-2.2 3.5-5 3.5-5-1.3-5-3.5">
+            </path>
+          </svg>
+          <span>Financeiro</span>
+        </button>
+        <button class="nav-item" type="button" aria-label="Suporte">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+            stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M9.5 9a2.8 2.8 0 1 1 4.9 1.8c-.7.5-1.4 1-1.4 2"></path>
+            <path d="M12 17.2h.01"></path>
+          </svg>
+          <span>Suporte</span>
+        </button>
+        <button class="nav-item active" type="button" aria-label="Perfil">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+            stroke-linejoin="round">
+            <circle cx="12" cy="8" r="3.5"></circle>
+            <path d="M5.5 20c1.7-3.5 5-5 6.5-5s4.8 1.5 6.5 5"></path>
+          </svg>
+          <span>Perfil</span>
+        </button>
+      </nav>
+    </section>
+  </div>
+
+  <script>
+    const setupScreen = document.getElementById("setupScreen");
+    const profileScreen = document.getElementById("profileScreen");
+    const nameInput = document.getElementById("nameInput");
+    const courseSelect = document.getElementById("courseSelect");
+    const cpfInput = document.getElementById("cpfInput");
+    const birthInput = document.getElementById("birthInput");
+    const continueBtn = document.getElementById("continueBtn");
+    const randomBtn = document.getElementById("randomBtn");
+    const toggleCardBtn = document.getElementById("toggleCardBtn");
+    const studentName = document.getElementById("studentName");
+    const courseName = document.getElementById("courseName");
+    const registrationNumber = document.getElementById("registrationNumber");
+    const cpfDisplay = document.getElementById("cpfDisplay");
+    const birthDisplay = document.getElementById("birthDisplay");
+    const validityDisplay = document.getElementById("validityDisplay");
+    const avatar = document.getElementById("avatar");
+    const copyBtn = document.getElementById("copyBtn");
+    const homeBtn = document.querySelector('.nav-item[aria-label="Início"]');
+    const exitBtn = document.getElementById("exitBtn");
+    const topBars = document.querySelectorAll(".top");
+
+    const defaultName = "";
+    const defaultCourse = "Fotografia";
+    const defaultCpf = "";
+    const defaultBirthDate = "";
+
+    function getInitials(fullName) {
+      const parts = fullName.trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return "??";
+      const first = parts[0][0] || "";
+      const last = parts.length > 1 ? parts[parts.length - 1][0] : parts[0][1] || "";
+      return (first + last).toUpperCase();
+    }
+
+    function randomDigits(length) {
+      let digits = "";
+      for (let index = 0; index < length; index += 1) {
+        digits += Math.floor(Math.random() * 10);
+      }
+      return digits;
+    }
+
+    function formatCpf(value) {
+      const digits = value.replace(/\D/g, "").slice(0, 11);
+      const parts = [
+        digits.slice(0, 3),
+        digits.slice(3, 6),
+        digits.slice(6, 9),
+        digits.slice(9, 11),
+      ].filter(Boolean);
+
+      if (parts.length < 4) {
+        return parts.join(".");
+      }
+
+      return `${parts[0]}.${parts[1]}.${parts[2]}-${parts[3]}`;
+    }
+
+    function buildRegistrationNumber() {
+      const suffix = randomDigits(8);
+      return `2023 ${suffix.slice(0, 4)} ${suffix.slice(4)}`;
+    }
+
+    function formatBirthDate(value) {
+      if (!value) return "—";
+      const [year, month, day] = value.split("-").map(Number);
+      const date = new Date(year, month - 1, day);
+      const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+      return `${String(date.getDate()).padStart(2, "0")} ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+    }
+
+    function getNextSemesterValidity(referenceDate = new Date()) {
+      const month = referenceDate.getMonth();
+      const year = referenceDate.getFullYear();
+      if (month < 6) {
+        return `Dez ${year}`;
+      }
+      return `Jun ${year + 1}`;
+    }
+
+    function showSetupScreen() {
+      setupScreen.classList.add("active");
+      profileScreen.classList.remove("active");
+    }
+
+    function showProfileScreen() {
+      setupScreen.classList.remove("active");
+      profileScreen.classList.add("active");
+    }
+
+    function syncTopCollapse() {
+      const collapsed = profileScreen.classList.contains("active") && window.scrollY > 22;
+      topBars.forEach((topBar) => topBar.classList.toggle("is-collapsed", collapsed));
+    }
+
+    function setCardExpanded(expanded) {
+      const card = document.querySelector(".card");
+      card.classList.toggle("is-collapsed", !expanded);
+      toggleCardBtn.innerHTML = expanded
+        ? `<span class="link-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 17 17 7"></path>
+                <path d="M17 17V7H7"></path>
+              </svg>
+            </span>
+            Recolher carteirinha`
+        : `<span class="link-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 17 17 7"></path>
+                <path d="M17 17V7H7"></path>
+              </svg>
+            </span>
+            Expandir carteirinha`;
+    }
+
+    function applyProfileData() {
+      const name = nameInput.value.trim() || defaultName;
+      const course = courseSelect.value || defaultCourse;
+      const cpf = formatCpf(cpfInput.value || defaultCpf);
+      const birthDate = birthInput.value || defaultBirthDate;
+      const matricula = buildRegistrationNumber();
+
+      studentName.textContent = name;
+      courseName.textContent = course;
+      avatar.textContent = getInitials(name);
+      registrationNumber.textContent = matricula;
+      cpfDisplay.textContent = cpf;
+      birthDisplay.textContent = formatBirthDate(birthDate);
+      validityDisplay.textContent = getNextSemesterValidity(new Date());
+    }
+
+    nameInput.value = defaultName;
+    courseSelect.value = defaultCourse;
+    cpfInput.value = defaultCpf;
+    birthInput.value = defaultBirthDate;
+
+    continueBtn.addEventListener("click", () => {
+      applyProfileData();
+      showProfileScreen();
+      setCardExpanded(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      syncTopCollapse();
+    });
+
+    randomBtn.addEventListener("click", () => {
+      registrationNumber.textContent = buildRegistrationNumber();
+    });
+
+    cpfInput.addEventListener("input", () => {
+      cpfInput.value = formatCpf(cpfInput.value);
+    });
+
+    toggleCardBtn.addEventListener("click", () => {
+      const card = document.querySelector(".card");
+      setCardExpanded(card.classList.contains("is-collapsed"));
+    });
+
+    homeBtn.addEventListener("click", () => {
+      showSetupScreen();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    exitBtn.addEventListener("click", () => {
+      showSetupScreen();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(registrationNumber.textContent);
+        const previousColor = copyBtn.style.color;
+        copyBtn.style.color = "#7ee081";
+        setTimeout(() => {
+          copyBtn.style.color = previousColor || "#ffffff";
+        }, 800);
+      } catch {
+        alert("Não foi possível copiar agora.");
+      }
+    });
+
+    window.addEventListener("scroll", syncTopCollapse, { passive: true });
+    setCardExpanded(true);
+    showProfileScreen();
+    syncTopCollapse();
+  </script>
+</body>
+
+</html>
