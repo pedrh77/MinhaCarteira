@@ -5,517 +5,75 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Minha Carteira</title>
+  <meta name="theme-color" content="#0868e8" />
   <style>
-    :root {
-      --blue: #0e6be8;
-      --blue-line: rgba(255, 255, 255, 0.14);
-      --text: #111827;
-      --surface: #f3f4f6;
-      --white: #ffffff;
-      --border: #d1d5db;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      background-attachment: fixed;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 430px;
-      min-height: 100vh;
-      margin: 0 auto;
-      padding-bottom: 24px;
-      overflow-x: hidden;
-    }
-
-    .screen {
-      display: none;
-      min-height: 100vh;
-    }
-
-    .screen.active {
-      display: block;
-    }
-
-    .setup-screen {
-      display: none;
-    }
-
-    .setup-screen.active {
-      display: flex;
-    }
-
-    .top {
-      width: 100vw;
-      margin-left: calc(50% - 50vw);
-      color: var(--white);
-      text-align: center;
-      padding: 18px 16px 22px;
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      background: #0e6be8;
-      box-shadow: 0 8px 18px rgba(12, 34, 66, 0.08);
-      transition: padding 180ms ease, box-shadow 180ms ease, opacity 180ms ease, transform 180ms ease;
-    }
-
-    .top.is-collapsed {
-      padding-top: 8px;
-      padding-bottom: 10px;
-      opacity: 0.98;
-      box-shadow: 0 4px 12px rgba(12, 34, 66, 0.06);
-      transform: translateY(-8px);
-    }
-
-    .top h1 {
-      margin: 0;
-      font-size: 1.15rem;
-      font-weight: 700;
-    }
-
-    .brand {
-      margin-top: 12px;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      justify-content: center;
-      font-size: 2rem;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      color: var(--white);
-      transition: transform 180ms ease, opacity 180ms ease;
-    }
-
-    .top.is-collapsed .brand {
-      transform: translateY(-4px) scale(0.96);
-      opacity: 0.96;
-    }
-
-    .brand-logo {
-      width: min(190px, 62vw);
-      height: auto;
-      object-fit: contain;
-      display: block;
-      transition: width 180ms ease, opacity 180ms ease;
-    }
-
-    .top.is-collapsed .brand-logo {
-      width: min(172px, 56vw);
-    }
-
-    .main {
-      padding: 0 0 24px;
-    }
-
-    .card,
-    .menu-card {
-      width: calc(100% - 24px);
-      margin: 0 auto 18px;
-    }
-
-    .card {
-      background: linear-gradient(180deg, #0a356b 0%, #0b4283 100%);
-      color: var(--white);
-      border: 4px solid rgba(204, 226, 255, 0.75);
-      border-radius: 34px;
-      box-shadow: 0 18px 30px rgba(12, 34, 66, 0.22);
-      overflow: hidden;
-    }
-
-    .card.is-collapsed .divider,
-    .card.is-collapsed .section:not(:first-of-type) {
-      display: none;
-    }
-
-    .card-header {
-      display: grid;
-      grid-template-columns: 92px 1fr;
-      gap: 18px;
-      padding: 20px 20px 18px;
-      align-items: center;
-    }
-
-    .avatar {
-      width: 88px;
-      height: 88px;
-      border-radius: 50%;
-      background: #111111;
-      display: grid;
-      place-items: center;
-      font-size: 1.55rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-    }
-
-    .student-name {
-      margin: 0 0 10px;
-      font-size: 1.35rem;
-      line-height: 1.1;
-      font-weight: 800;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 76px;
-      padding: 10px 14px;
-      border-radius: 8px;
-      background: linear-gradient(180deg, #3f9b08 0%, #2c7e05 100%);
-      color: #d8f6c8;
-      font-size: 0.93rem;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-    }
-
-    .divider {
-      height: 1px;
-      background: var(--blue-line);
-    }
-
-    .section {
-      padding: 18px 22px 20px;
-      border-top: 1px solid var(--blue-line);
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px 24px;
-    }
-
-    .field-label {
-      display: block;
-      margin-bottom: 4px;
-      color: rgba(255, 255, 255, 0.72);
-      font-size: 0.97rem;
-      font-weight: 700;
-    }
-
-    .field-value {
-      display: block;
-      font-size: 1.04rem;
-      line-height: 1.25;
-      font-weight: 500;
-    }
-
-    .section-title {
-      margin: 0 0 6px;
-      color: rgba(255, 255, 255, 0.72);
-      font-size: 0.98rem;
-      font-weight: 700;
-    }
-
-    .course-name {
-      margin: 0 0 18px;
-      font-size: 1.08rem;
-      font-weight: 500;
-    }
-
-    .meta-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px 24px;
-    }
-
-    .meta-grid .full {
-      grid-column: 1 / -1;
-    }
-
-    .footer-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: end;
-      gap: 16px;
-    }
-
-    .copy-btn {
-      width: 34px;
-      height: 34px;
-      border: 0;
-      background: transparent;
-      padding: 0;
-      color: var(--white);
-      opacity: 0.9;
-    }
-
-    .copy-btn svg,
-    .nav-item svg,
-    .link-icon svg {
-      display: block;
-    }
-
-    .action-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      margin: 14px auto 24px;
-      color: #1c72e6;
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 1.02rem;
-      border: 0;
-      background: transparent;
-      padding: 0;
-      cursor: pointer;
-    }
-
-    .action-wrap {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-    }
-
-    .account-title {
-      margin: 18px 26px 18px;
-      font-size: 1.9rem;
-      line-height: 1.05;
-      letter-spacing: -0.03em;
-    }
-
-    .exit-btn {
-      width: calc(100% - 24px);
-      margin: 12px auto 92px;
-      display: block;
-      border: 0;
-      border-radius: 16px;
-      background: #ffffff;
-      color: #b42318;
-      font-size: 1rem;
-      font-weight: 800;
-      padding: 16px 18px;
-      box-shadow: 0 10px 24px rgba(12, 34, 66, 0.08);
-    }
-
-    .menu-card {
-      border: 2px solid var(--border);
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.95);
-      overflow: hidden;
-    }
-
-    .menu-item {
-      padding: 22px 28px;
-      font-size: 1.05rem;
-      color: #343a40;
-    }
-
-    .menu-item+.menu-item {
-      border-top: 1px solid #e6e7ea;
-    }
-
-    .edit-form {
-      display: grid;
-      gap: 14px;
-    }
-
-    .edit-form label {
-      display: grid;
-      gap: 8px;
-    }
-
-    .edit-form span {
-      font-size: 0.95rem;
-      color: #4b5563;
-    }
-
-    .edit-form input,
-    .edit-form select,
-    .edit-form button {
-      font: inherit;
-    }
-
-    .edit-form input,
-    .edit-form select {
-      padding: 14px 16px;
-      border: 1px solid #d1d5db;
-      border-radius: 12px;
-      background: #fff;
-    }
-
-    .edit-form button {
-      padding: 14px 16px;
-      border: 0;
-      border-radius: 12px;
-      background: #0e6be8;
-      color: #fff;
-      font-weight: 700;
-    }
-
-    .setup-actions {
-      display: grid;
-      gap: 10px;
-    }
-
-    .secondary-btn {
-      padding: 14px 16px;
-      border: 1px solid #cbd5e1;
-      border-radius: 12px;
-      background: #fff;
-      color: #1f2937;
-      font-weight: 700;
-    }
-
-    .nav {
-      position: fixed;
-      left: 50%;
-      bottom: 0;
-      transform: translateX(-50%);
-      width: min(430px, 100%);
-      background: rgba(255, 255, 255, 0.98);
-      border-top: 1px solid #e5e7eb;
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      padding: 10px 8px 12px;
-      z-index: 10;
-    }
-
-    .nav-item {
-      border: 0;
-      background: transparent;
-      color: #9b9b9b;
-      display: grid;
-      gap: 6px;
-      justify-items: center;
-      font-size: 0.8rem;
-    }
-
-    .nav-item.active {
-      color: #2e67d1;
-    }
-
-    .nav-item svg {
-      width: 30px;
-      height: 30px;
-    }
-
-    @media (max-width: 480px) {
-      .top {
-        padding: 14px 12px 18px;
-      }
-
-      .brand {
-        margin-top: 10px;
-      }
-
-      .brand-logo {
-        width: min(170px, 56vw);
-      }
-
-      .card,
-      .menu-card,
-      .setup-card {
-        width: calc(100% - 14px);
-      }
-
-      .card-header {
-        padding: 18px 14px 16px;
-        gap: 12px;
-      }
-
-      .section {
-        padding: 16px 14px 18px;
-      }
-
-      .account-title {
-        margin: 16px 14px 14px;
-        font-size: 1.65rem;
-      }
-
-      .menu-item {
-        padding: 18px 18px;
-      }
-
-      .setup-screen {
-        padding: 0 0 18px;
-      }
-
-      .exit-btn {
-        width: calc(100% - 14px);
-        margin-bottom: 96px;
-      }
-    }
-
-    .setup-screen {
-      flex-direction: column;
-      padding: 0 0 24px;
-    }
-
-    .setup-card {
-      width: calc(100% - 24px);
-      margin: 12px auto 0;
-      background: rgba(255, 255, 255, 0.96);
-      border-radius: 24px;
-      padding: 20px;
-      box-shadow: 0 18px 30px rgba(12, 34, 66, 0.12);
-    }
-
-    .setup-title {
-      margin: 0 0 8px;
-      font-size: 1.6rem;
-      line-height: 1.1;
-      letter-spacing: -0.03em;
-    }
-
-    .setup-text {
-      margin: 0 0 18px;
-      color: #6b7280;
-    }
-
-    @media (max-width: 380px) {
-      .top h1 {
-        font-size: 1.05rem;
-      }
-
-      .card-header {
-        grid-template-columns: 76px 1fr;
-      }
-
-      .avatar {
-        width: 76px;
-        height: 76px;
-        font-size: 1.35rem;
-      }
-
-      .student-name {
-        font-size: 1.15rem;
-      }
-
-      .grid-2,
-      .meta-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .nav {
-        padding: 8px 4px 10px;
-      }
-
-      .nav-item {
-        gap: 4px;
-        font-size: 0.72rem;
-      }
-
-      .nav-item svg {
-        width: 26px;
-        height: 26px;
-      }
-    }
-
-    @media (min-width: 431px) {
-
-      .setup-screen,
-      .main {
-        padding-left: 0;
-        padding-right: 0;
-      }
-    }
+    :root { --blue: #0868e8; --surface: #f2f2f2; --text: #202020; --line: #d6d6d6; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--surface); color: var(--text); font-family: "Segoe UI", Arial, sans-serif; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #75aff6; outline-offset: 4px; }
+    ::selection { background: #bdd9fc; color: #062650; }
+    .app { max-width: 430px; min-height: 100dvh; margin: auto; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .top { height: 199px; position: relative; padding: 68px 18px 36px; text-align: center; color: white; background: var(--blue); }
+    .top h1 { margin: 0; font-size: 17px; line-height: 24px; font-weight: 500; }
+    .back-btn { position: absolute; top: 62px; left: 12px; width: 40px; height: 40px; display: grid; place-items: center; border: 0; background: transparent; color: white; }
+    .back-btn svg { width: 24px; height: 24px; }
+    .brand { position: relative; width: 126px; height: 36px; margin: 36px auto 0; overflow: hidden; }
+    .brand-logo { position: absolute; display: block; width: 168px; height: 168px; max-width: none; top: -66px; left: -21px; filter: brightness(0) invert(1); }
+    .brand::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 33px; background: url("estacio-logo.png") -21px -66px / 168px 168px no-repeat; pointer-events: none; }
+    .main { position: relative; margin-top: -18px; padding: 0 18px 36px; }
+    .card { position: relative; color: #f4f5f8; border: 4px double #afd0f5; border-radius: 28px; background: linear-gradient(105deg, #07346a, #06254d); overflow: hidden; }
+    .card-header { display: grid; grid-template-columns: 59px minmax(0, 1fr); gap: 20px; align-items: center; min-height: 118px; padding: 18px; }
+    .avatar { width: 59px; height: 59px; border-radius: 50%; background: #111; display: grid; place-items: center; font-size: 20px; font-weight: 500; }
+    .student-name { max-width: 230px; margin: 0 0 10px; font-size: 18px; line-height: 1.3; font-weight: 400; overflow-wrap: anywhere; }
+    .badge { display: inline-block; padding: 6px 9px; border-radius: 4px; background: #167000; color: #e1f2dc; font-size: 12px; text-transform: uppercase; }
+    .section { padding: 18px; }
+    .personal-section { border-top: 1px solid #a5b8cc; padding-top: 14px; padding-bottom: 24px; }
+    .course-section { border-top: 1px solid #ffffff26; padding-top: 20px; padding-bottom: 16px; }
+    .grid-2 { display: grid; grid-template-columns: 105px minmax(0, 1fr); gap: 14px; }
+    .field-label, .section-title { display: block; margin: 0 0 3px; color: #c4cfdb; font-size: 12px; line-height: 1.25; font-weight: 650; }
+    .field-value, .course-name { display: block; margin: 0; font-size: 14px; line-height: 1.35; font-weight: 400; overflow-wrap: anywhere; }
+    .course-name { margin-bottom: 17px; }
+    .meta-grid { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 16px 18px; }
+    .meta-grid .full { grid-column: 1 / -1; }
+    .footer-section { margin: 0 14px; padding: 20px 4px 14px; border-top: 1px solid #ffffff26; }
+    .footer-row { display: grid; grid-template-columns: minmax(0, 1fr) auto 24px; gap: 14px; align-items: end; }
+    #validityDisplay { font-weight: 700; }
+    .copy-btn { width: 32px; height: 32px; margin: 0 -4px; padding: 7px; background: transparent; color: #edf2f7; border: 0; }
+    .copy-btn svg { display: block; width: 18px; height: 18px; }
+    .card.is-collapsed .personal-section, .card.is-collapsed .meta-grid, .card.is-collapsed .badge { display: none; }
+    .card.is-collapsed .card-header { min-height: 94px; padding-top: 18px; padding-bottom: 4px; }
+    .card.is-collapsed .student-name { margin: 0; }
+    .card.is-collapsed .course-section { border: 0; padding-top: 8px; padding-bottom: 0; }
+    .card.is-collapsed .course-name { margin-bottom: 0; }
+    .card.is-collapsed .footer-section { border: 0; padding-top: 20px; }
+    .action-wrap { display: flex; justify-content: center; margin: 22px 0 34px; }
+    .action-link { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 40px; padding: 0 8px; border: 0; color: #0968ce; background: transparent; font-size: 14px; font-weight: 500; }
+    .link-icon svg { display: block; width: 18px; height: 18px; }
+    .account-title { margin: 0 0 22px; font-size: 18px; line-height: 1.4; font-weight: 400; }
+    .rewards { width: 100%; display: flex; align-items: center; gap: 9px; padding: 8px 11px; min-height: 54px; margin-bottom: 13px; border: 1px solid #b0cfee; border-radius: 9px; background: white; font-size: 14px; }
+    .reward-icon { display: grid; place-items: center; width: 31px; height: 31px; border-radius: 4px; background: #e1ecfa; color: #48545b; }
+    .reward-icon svg { width: 18px; height: 18px; }
+    .menu-card { border: 1px solid #cfcfcf; border-radius: 9px; background: white; padding: 4px 13px; }
+    .menu-item { display: block; width: 100%; text-align: left; padding: 12px 8px; min-height: 43px; border: 0; background: transparent; color: var(--text); font-size: 14px; }
+    .menu-item + .menu-item { border-top: 1px solid var(--line); }
+    .exit-btn { display: block; margin: 44px auto 0; min-height: 44px; padding: 8px 20px; border: 0; background: transparent; color: #0968ce; font-size: 14px; }
+    .nav { display: none; }
+    .setup-card { margin: 18px; padding: 22px; background: white; border: 1px solid var(--line); border-radius: 12px; }
+    .setup-title { margin: 0 0 8px; font-size: 23px; font-weight: 500; }
+    .setup-text { margin: 0 0 22px; color: #5b626b; font-size: 14px; line-height: 1.5; }
+    .edit-form, .edit-form label, .setup-actions { display: grid; gap: 14px; }
+    .edit-form label { gap: 6px; font-size: 14px; }
+    .edit-form input, .edit-form select { width: 100%; min-width: 0; padding: 12px; border: 1px solid #c4cbd4; border-radius: 6px; background: white; color: var(--text); caret-color: var(--blue); }
+    .edit-form button { min-height: 44px; padding: 12px; border: 0; border-radius: 6px; background: var(--blue); color: white; }
+    .edit-form .secondary-btn { background: white; color: #0968ce; border: 1px solid #b0cfee; }
+    .form-status { margin: 0; font-size: 13px; color: #525e6b; line-height: 1.5; }
+    .feedback { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: max-content; max-width: calc(100% - 36px); padding: 12px 18px; border-radius: 8px; background: #172b45; color: white; font-size: 14px; z-index: 30; }
+    .feedback:empty { display: none; }
+    @media (max-width: 359px) { .main { padding-left: 12px; padding-right: 12px; } .card-header { gap: 12px; padding-left: 14px; padding-right: 14px; } .section { padding-left: 14px; padding-right: 14px; } .footer-row { gap: 8px; } .student-name { font-size: 17px; } .field-value, .course-name { font-size: 13px; } }
   </style>
 </head>
 
@@ -525,19 +83,19 @@
       <div class="top">
         <h1>Perfil</h1>
         <div class="brand" aria-label="Estácio">
-          <img class="brand-logo" src="universidade-estacio-de-sa-logo-png_seeklogo-193869.webp"
+          <img class="brand-logo" src="estacio-logo.png"
             alt="Logo da Estácio" />
         </div>
       </div>
 
       <div class="setup-card">
         <h2 class="setup-title">Montar sua carteirinha</h2>
-        <p class="setup-text">Digite seus dados e siga para a tela limpa do perfil.</p>
+        <p class="setup-text">Preencha uma vez. Seus dados ficam salvos neste navegador para a próxima visita.</p>
 
-        <div class="edit-form">
+        <form class="edit-form" id="profileForm">
           <label>
             <span>Seu nome</span>
-            <input id="nameInput" type="text" placeholder="Digite seu nome" />
+            <input id="nameInput" type="text" required autocomplete="name" maxlength="120" placeholder="Digite seu nome" />
           </label>
 
           <label>
@@ -560,28 +118,30 @@
 
           <label>
             <span>Data de nascimento</span>
-            <input id="birthInput" type="date" />
+            <input id="birthInput" type="date" autocomplete="bday" />
           </label>
 
           <div class="setup-actions">
-            <button id="continueBtn" type="button">Continuar</button>
+            <button id="continueBtn" type="submit">Salvar e continuar</button>
             <button id="randomBtn" class="secondary-btn" type="button">Sortear matrícula agora</button>
           </div>
-        </div>
+          <p class="form-status" id="storageStatus" role="status">Os dados são salvos somente neste navegador.</p>
+        </form>
       </div>
     </section>
 
     <section class="screen" id="profileScreen">
       <div class="top">
+        <button class="back-btn" id="backBtn" type="button" aria-label="Voltar aos meus dados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7" /></svg></button>
         <h1>Perfil</h1>
         <div class="brand" aria-label="Estácio">
-          <img class="brand-logo" src="universidade-estacio-de-sa-logo-png_seeklogo-193869.webp"
+          <img class="brand-logo" src="estacio-logo.png"
             alt="Logo da Estácio" />
         </div>
       </div>
 
       <main class="main">
-        <section class="card" aria-label="Carteirinha do estudante">
+        <section class="card is-collapsed" id="studentCard" aria-label="Carteirinha do estudante">
           <div class="card-header">
             <div class="avatar" id="avatar"></div>
             <div>
@@ -590,9 +150,9 @@
             </div>
           </div>
 
-          <div class="divider"></div>
 
-          <div class="section">
+
+          <div class="section personal-section" id="personalDetails">
             <div class="grid-2">
               <div>
                 <span class="field-label">CPF</span>
@@ -605,11 +165,11 @@
             </div>
           </div>
 
-          <div class="section">
+          <div class="section course-section">
             <p class="section-title">Curso</p>
             <p class="course-name" id="courseName"></p>
 
-            <div class="meta-grid">
+            <div class="meta-grid" id="courseDetails">
               <div>
                 <span class="field-label">Tipo de curso</span>
                 <span class="field-value">Graduação</span>
@@ -625,7 +185,7 @@
             </div>
           </div>
 
-          <div class="section">
+          <div class="section footer-section">
             <div class="footer-row">
               <div>
                 <span class="field-label">Validade</span>
@@ -660,11 +220,13 @@
         </div>
 
         <h2 class="account-title">Minha conta</h2>
+        <div class="rewards"><span class="reward-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9Z" /></svg></span>Conquistas e recompensas</div>
 
         <section class="menu-card" aria-label="Menu da conta">
-          <div class="menu-item">Meus dados</div>
+          <button class="menu-item" id="editProfileBtn" type="button">Meus dados</button>
           <div class="menu-item">Política de Privacidade</div>
-          <div class="menu-item">Configurações</div>
+          <div class="menu-item">Envio de documentação</div>
+          <div class="menu-item">Configuração de atendimento</div>
         </section>
 
         <button class="exit-btn" type="button" id="exitBtn">Sair</button>
@@ -718,6 +280,8 @@
     </section>
   </div>
 
+  <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+
   <script>
     const setupScreen = document.getElementById("setupScreen");
     const profileScreen = document.getElementById("profileScreen");
@@ -738,7 +302,15 @@
     const copyBtn = document.getElementById("copyBtn");
     const homeBtn = document.querySelector('.nav-item[aria-label="Início"]');
     const exitBtn = document.getElementById("exitBtn");
-    const topBars = document.querySelectorAll(".top");
+    const profileForm = document.getElementById("profileForm");
+    const storageStatus = document.getElementById("storageStatus");
+    const feedback = document.getElementById("feedback");
+    // Versioned key: change the version when the saved data format changes.
+    const STORAGE_KEY = "minhaCarteira.profile.v1";
+    let profile = null;
+    let expanded = false;
+    let feedbackTimer;
+    let pendingRegistration = null;
 
     const defaultName = "";
     const defaultCourse = "Fotografia";
@@ -809,100 +381,141 @@
       profileScreen.classList.add("active");
     }
 
-    function syncTopCollapse() {
-      const collapsed = profileScreen.classList.contains("active") && window.scrollY > 22;
-      topBars.forEach((topBar) => topBar.classList.toggle("is-collapsed", collapsed));
+    function notify(message) {
+      clearTimeout(feedbackTimer);
+      feedback.textContent = message;
+      feedbackTimer = setTimeout(() => { feedback.textContent = ""; }, 3500);
     }
 
-    function setCardExpanded(expanded) {
-      const card = document.querySelector(".card");
-      card.classList.toggle("is-collapsed", !expanded);
-      toggleCardBtn.innerHTML = expanded
-        ? `<span class="link-icon" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M7 17 17 7"></path>
-                <path d="M17 17V7H7"></path>
-              </svg>
-            </span>
-            Recolher carteirinha`
-        : `<span class="link-icon" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M7 17 17 7"></path>
-                <path d="M17 17V7H7"></path>
-              </svg>
-            </span>
-            Expandir carteirinha`;
+    function saveProfile() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, ...profile, expanded }));
+        storageStatus.textContent = "Dados salvos neste navegador.";
+        return true;
+      } catch {
+        storageStatus.textContent = "Não foi possível salvar neste navegador. Os dados duram somente nesta sessão.";
+        return false;
+      }
     }
 
-    function applyProfileData() {
-      const name = nameInput.value.trim() || defaultName;
-      const course = courseSelect.value || defaultCourse;
-      const cpf = formatCpf(cpfInput.value || defaultCpf);
-      const birthDate = birthInput.value || defaultBirthDate;
-      const matricula = buildRegistrationNumber();
-
-      studentName.textContent = name;
-      courseName.textContent = course;
-      avatar.textContent = getInitials(name);
-      registrationNumber.textContent = matricula;
-      cpfDisplay.textContent = cpf;
-      birthDisplay.textContent = formatBirthDate(birthDate);
-      validityDisplay.textContent = getNextSemesterValidity(new Date());
+    function loadProfile() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        const fields = ["name", "course", "cpf", "birthDate", "registration", "validity"];
+        if (saved.version !== 1 || !fields.every(key => typeof saved[key] === "string") ||
+            !saved.name.trim() || !/^2023 \d{4} \d{4}$/.test(saved.registration) ||
+            !Array.from(courseSelect.options).some(option => option.value === saved.course)) {
+          throw new Error("Invalid saved profile");
+        }
+        profile = Object.fromEntries(fields.map(key => [key, saved[key]]));
+        expanded = saved.expanded === true;
+      } catch {
+        storageStatus.textContent = "Não foi possível recuperar os dados salvos. Preencha novamente para salvar.";
+      }
     }
 
-    nameInput.value = defaultName;
-    courseSelect.value = defaultCourse;
-    cpfInput.value = defaultCpf;
-    birthInput.value = defaultBirthDate;
+    function setCardExpanded(value) {
+      expanded = value;
+      document.getElementById("studentCard").classList.toggle("is-collapsed", !expanded);
+      document.getElementById("personalDetails").hidden = !expanded;
+      document.getElementById("courseDetails").hidden = !expanded;
+      toggleCardBtn.setAttribute("aria-expanded", String(expanded));
+      toggleCardBtn.setAttribute("aria-controls", "personalDetails courseDetails");
+      toggleCardBtn.innerHTML = `<span class="link-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          ${expanded
+            ? '<path d="m3 3 6 6M9 3v6H3M21 21l-6-6M15 21v-6h6" />'
+            : '<path d="m3 21 6-6M3 15v6h6M21 3l-6 6M15 3h6v6" />'}
+        </svg></span>${expanded ? "Recolher" : "Expandir"} carteirinha`;
+    }
 
-    continueBtn.addEventListener("click", () => {
-      applyProfileData();
+    function renderProfile() {
+      studentName.textContent = profile.name;
+      courseName.textContent = profile.course;
+      avatar.textContent = getInitials(profile.name);
+      registrationNumber.textContent = profile.registration;
+      cpfDisplay.textContent = profile.cpf || "—";
+      birthDisplay.textContent = formatBirthDate(profile.birthDate);
+      validityDisplay.textContent = profile.validity;
+    }
+
+    function editProfile() {
+      showSetupScreen();
+      window.scrollTo({ top: 0 });
+      nameInput.focus({ preventScroll: true });
+    }
+
+    loadProfile();
+    nameInput.value = profile?.name || defaultName;
+    courseSelect.value = profile?.course || defaultCourse;
+    cpfInput.value = profile?.cpf || defaultCpf;
+    birthInput.value = profile?.birthDate || defaultBirthDate;
+
+    profileForm.addEventListener("submit", event => {
+      event.preventDefault();
+      if (!nameInput.value.trim()) {
+        nameInput.setCustomValidity("Digite seu nome para continuar.");
+        nameInput.reportValidity();
+        return;
+      }
+      profile = {
+        name: nameInput.value.trim(),
+        course: courseSelect.value,
+        cpf: formatCpf(cpfInput.value),
+        birthDate: birthInput.value,
+        // Generate once. Editing personal details keeps the same registration.
+        registration: profile?.registration || pendingRegistration || buildRegistrationNumber(),
+        validity: profile?.validity || getNextSemesterValidity(),
+      };
+      const saved = saveProfile();
+      renderProfile();
       showProfileScreen();
-      setCardExpanded(true);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      syncTopCollapse();
+      window.scrollTo({ top: 0 });
+      if (!saved) notify(storageStatus.textContent);
     });
 
+    nameInput.addEventListener("input", () => nameInput.setCustomValidity(""));
     randomBtn.addEventListener("click", () => {
-      registrationNumber.textContent = buildRegistrationNumber();
+      const registration = buildRegistrationNumber();
+      if (profile) {
+        profile.registration = registration;
+        if (!saveProfile()) notify(storageStatus.textContent);
+        renderProfile();
+      } else {
+        // Keep the requested number for the first save as well.
+        pendingRegistration = registration;
+      }
+      storageStatus.textContent = `Matrícula sorteada: ${registration}. Continue para salvar seus dados.`;
     });
 
-    cpfInput.addEventListener("input", () => {
-      cpfInput.value = formatCpf(cpfInput.value);
-    });
-
+    cpfInput.addEventListener("input", () => { cpfInput.value = formatCpf(cpfInput.value); });
     toggleCardBtn.addEventListener("click", () => {
-      const card = document.querySelector(".card");
-      setCardExpanded(card.classList.contains("is-collapsed"));
+      setCardExpanded(!expanded);
+      if (profile && !saveProfile()) notify(storageStatus.textContent);
     });
-
-    homeBtn.addEventListener("click", () => {
-      showSetupScreen();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-
-    exitBtn.addEventListener("click", () => {
-      showSetupScreen();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-
+    homeBtn.addEventListener("click", editProfile);
+    document.getElementById("editProfileBtn").addEventListener("click", editProfile);
+    document.getElementById("backBtn").addEventListener("click", editProfile);
+    // Leaving the profile keeps the saved data available for the next visit.
+    exitBtn.addEventListener("click", editProfile);
     copyBtn.addEventListener("click", async () => {
       try {
         await navigator.clipboard.writeText(registrationNumber.textContent);
-        const previousColor = copyBtn.style.color;
-        copyBtn.style.color = "#7ee081";
-        setTimeout(() => {
-          copyBtn.style.color = previousColor || "#ffffff";
-        }, 800);
+        notify("Matrícula copiada.");
       } catch {
-        alert("Não foi possível copiar agora.");
+        notify("Não foi possível copiar. Selecione a matrícula para copiar manualmente.");
       }
     });
 
-    window.addEventListener("scroll", syncTopCollapse, { passive: true });
-    setCardExpanded(true);
-    showSetupScreen();
-    syncTopCollapse();
+    setCardExpanded(expanded);
+    if (profile) {
+      renderProfile();
+      showProfileScreen();
+    } else {
+      showSetupScreen();
+    }
   </script>
 </body>
 
